@@ -1,0 +1,20 @@
+[project]
+name = "appsec_agents"
+version = "0.1.0"
+description = "appsec-agents using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<=3.13"
+dependencies = [
+    "crewai[tools]>=0.83.0,<1.0.0"
+]
+
+[project.scripts]
+appsec_agents = "appsec_agents.main:run"
+run_crew = "appsec_agents.main:run"
+train = "appsec_agents.main:train"
+replay = "appsec_agents.main:replay"
+test = "appsec_agents.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,82 @@
+vulnerability_research_task:
+  description: >
+    Conduct an in-depth analysis to identify potential security vulnerabilities across
+    the specified systems, applications, or infrastructure. Focus on emerging threats and vulnerabilities
+    as of 2024.
+  expected_output: >
+    A list of 10 security vulnerabilities, each with a brief description, the affected systems, and the 
+    potential risks associated with them.
+  agent: vulnerability_researcher
+
+incident_diagnosis_task:
+  description: >
+    Analyze a given security incident to identify the root cause, affected systems, and extent of impact.
+    Trace the vulnerability back to its source and document the findings.
+  expected_output: >
+    A detailed report outlining the root cause, affected components, timeline of the incident,
+    and recommendations for immediate mitigation.
+  agent: incident_diagnostician
+
+remediation_task:
+  description: >
+    Create a plan to remediate the identified vulnerabilities or fix the root cause of a given incident.
+    Develop patches or configuration changes required to secure the system.
+  expected_output: >
+    A step-by-step remediation guide including code snippets, system configurations,
+    or process updates to resolve the identified issue.
+  agent: remediation_engineer
+
+threat_hunting_task:
+  description: >
+    Conduct a proactive search for signs of malicious activity or threats within the system.
+    Look for suspicious patterns, anomalies, or indicators of compromise (IoCs).
+  expected_output: >
+    A list of potential threats or anomalies discovered, with details on their nature,
+    affected components, and suggested containment or mitigation steps.
+  agent: threat_hunter
+
+security_reporting_task:
+  description: >
+    Compile findings from vulnerability assessments, incident analysis, and remediation efforts
+    into a comprehensive report. Ensure the report is clear and actionable for stakeholders.
+  expected_output: >
+    A complete security report with sections for vulnerabilities, incidents, remediations,
+    and recommendations. Formatted as markdown without '```'.
+  agent: reporting_specialist
+
+policy_review_task:
+  description: >
+    Analyze existing security policies and practices to identify gaps or outdated measures.
+    Propose updates to align policies with current best practices and threats in 2024.
+  expected_output: >
+    A document with recommendations for policy updates, including specific actions to improve 
+    security posture and prevent future vulnerabilities.
+  agent: policy_advisor
+
+penetration_testing_task:
+  description: >
+    Perform a penetration test on a given system or application to uncover exploitable vulnerabilities.
+    Simulate real-world attacks to assess security defenses.
+  expected_output: >
+    A detailed report of penetration testing findings, including vulnerabilities exploited,
+    attack vectors, and suggestions for mitigating the risks.
+  agent: vulnerability_researcher
+
+incident_postmortem_task:
+  description: >
+    Conduct a postmortem analysis of a resolved security incident. Assess what went wrong, 
+    what was done well, and what can be improved in the future.
+  expected_output: >
+    A postmortem report including a timeline of events, root cause, mitigation steps taken,
+    and actionable lessons for improving incident response processes.
+  agent: incident_diagnostician
+
+remediation_validation_task:
+  description: >
+    Verify that the implemented fixes or patches have resolved the identified vulnerabilities
+    without introducing new issues. Test for completeness and effectiveness.
+  expected_output: >
+    A validation report confirming successful remediation, including test results and 
+    any additional adjustments required.
+  agent: remediation_engineer
+
