@@ -35,7 +35,8 @@ console_handler.setFormatter(logging.Formatter('%(message)s'))
 # Configure logging with both handlers using basicConfig
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',  # Format for the root logger
+    # Format for the root logger
+    format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[rotating_file_handler, console_handler]  # Attach both handlers
 )
 
@@ -50,7 +51,7 @@ def run():
     Run the crew to analyze a GitHub repository for security vulnerabilities.
     """
     inputs = {
-        'repository_url': 'https://github.com/lochgeo/food-pooling',
+        'repo_url': 'https://github.com/ewfx/appsec_sample_code',
         'scan_depth': 3,
         'analysis_mode': 'quick'
     }
@@ -59,14 +60,14 @@ def run():
         appsec = AppsecAgents()
         crew = appsec.crew()
         crew.kickoff(inputs=inputs)
-        
+
         # Wait for the crew to complete its execution
-        
+
         while not crew.is_complete():
             time.sleep(1)  # Sleep for a short duration to avoid busy-waiting
-            
+
         logger.info("Crew execution completed.")
-        
+
         # Retrieve and print the results
         results = crew.get_results()
         logger.info("Crew results:")
@@ -81,12 +82,13 @@ def train():
     Train the crew for a given number of iterations.
     """
     inputs = {
-        'repository_url': 'https://github.com/lochgeo/food-pooling',
+        'repository_url': 'https://github.com/ewfx/appsec_sample_code',
         'scan_depth': 3,
         'analysis_mode': 'quick'
     }
     try:
-        AppsecAgents().crew().train(n_iterations=int(sys.argv[1]), filename=sys.argv[2], inputs=inputs)
+        AppsecAgents().crew().train(n_iterations=int(
+            sys.argv[1]), filename=sys.argv[2], inputs=inputs)
     except Exception as e:
         print(f"An error occurred while training the crew: {e}")
 
@@ -109,7 +111,8 @@ def test():
         'repository_url': 'https://github.com/example/example-repo',
     }
     try:
-        AppsecAgents().crew().test(n_iterations=int(sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
+        AppsecAgents().crew().test(n_iterations=int(
+            sys.argv[1]), openai_model_name=sys.argv[2], inputs=inputs)
     except Exception as e:
         print(f"An error occurred while testing the crew: {e}")
 

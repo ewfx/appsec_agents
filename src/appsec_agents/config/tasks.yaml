@@ -38,7 +38,7 @@ remediation_validation_task:
 clone_repository_task:
   description: >
     Clone a specified GitHub repository to a local directory. Ensure the repository is 
-    correctly cloned with all branches and commits.
+    correctly cloned with all branches and commits. Clone the repo at this url {repo_url}
   expected_output: >
     The local path where the repository has been cloned, including all branches and commits.
   agent: repository_cloner
