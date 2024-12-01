@@ -1,10 +1,10 @@
 run_static_analysis_task:
   description: >
-    Conduct an in-depth analysis to identify potential security vulnerabilities across
+    Scan the repository at {local_path} and conduct an in-depth analysis to identify potential security vulnerabilities across
     the specified systems, applications, or infrastructure. Focus on emerging threats and vulnerabilities
     as of 2024.
   expected_output: >
-    A list of 10 security vulnerabilities, each with a brief description, the affected systems, and the 
+    A list of all the security vulnerabilities present in the repo, each with a brief description, the affected systems, and the 
     potential risks associated with them.
   agent: static_analyzer
 
@@ -37,16 +37,16 @@ remediation_validation_task:
 
 clone_repository_task:
   description: >
-    Clone a specified GitHub repository to a local directory. Ensure the repository is 
-    correctly cloned with all branches and commits. Clone the repo at this url {repo_url}
+    Clone the repo at {repo_url} to {local_path}. Ensure the repository is 
+    correctly cloned with all branches and commits.
   expected_output: >
     The local path where the repository has been cloned, including all branches and commits.
   agent: repository_cloner
 
 detect_secrets_task:
   description: >
-    Scan the specified repository for any exposed secrets such as API keys, passwords, or other sensitive information.
+    Scan the repository at {local_path} for any exposed secrets such as API keys, passwords, or other sensitive information.
     Use tools like Git Secrets or TruffleHog to perform the scan.
   expected_output: >
-    A list of detected secrets, including the file paths, lines where the secrets were found, and the type of secret.
+    A brief report containing the list of detected secrets, including where they were found, what type they are and how to correctly address it.
   agent: secret_detector

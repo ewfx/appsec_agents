@@ -52,6 +52,7 @@ def run():
     """
     inputs = {
         'repo_url': 'https://github.com/ewfx/appsec_sample_code',
+        'local_path': '/tmp/cloned_repo',
         'scan_depth': 3,
         'analysis_mode': 'quick'
     }
@@ -59,19 +60,10 @@ def run():
         logger.info("Starting the crew...")
         appsec = AppsecAgents()
         crew = appsec.crew()
-        crew.kickoff(inputs=inputs)
-
-        # Wait for the crew to complete its execution
-
-        while not crew.is_complete():
-            time.sleep(1)  # Sleep for a short duration to avoid busy-waiting
-
+        crew_output = crew.kickoff(inputs=inputs)
         logger.info("Crew execution completed.")
-
-        # Retrieve and print the results
-        results = crew.get_results()
         logger.info("Crew results:")
-        logger.info(json.dumps(results, indent=2))
+        logger.info(crew_output.raw)
 
     except Exception as e:
         print(f"An error occurred while running the crew: {e}")
@@ -82,9 +74,10 @@ def train():
     Train the crew for a given number of iterations.
     """
     inputs = {
-        'repository_url': 'https://github.com/ewfx/appsec_sample_code',
+        'repo_url': 'https://github.com/ewfx/appsec_sample_code',
+        'local_path': '/tmp/cloned_repo',
         'scan_depth': 3,
-        'analysis_mode': 'quick'
+        'analysis_mode': 'quick',
     }
     try:
         AppsecAgents().crew().train(n_iterations=int(

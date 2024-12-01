@@ -4,9 +4,13 @@ from pydantic import BaseModel, Field
 import subprocess
 import os
 
+
 class CodePatternMatcherInput(BaseModel):
-    repo_path: str = Field(..., description="Path to the locally cloned repository.")
-    pattern: str = Field(..., description="Regex pattern to search for in the codebase.")
+    local_path: str = Field(...,
+                            description="Path to the locally cloned repository.")
+    pattern: str = Field(...,
+                         description="Regex pattern to search for in the codebase.")
+
 
 class CodePatternMatcherTool(BaseTool):
     name: str = "Custom Code Pattern Matcher"
@@ -16,15 +20,15 @@ class CodePatternMatcherTool(BaseTool):
     )
     args_schema: Type[BaseModel] = CodePatternMatcherInput
 
-    def _run(self, repo_path: str, pattern: str) -> str:
+    def _run(self, local_path: str, pattern: str) -> str:
         try:
             result = subprocess.run(
-                ["grep", "-r", pattern, repo_path],
+                ["grep", "-r", pattern, local_path],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
             )
-            
+
             if result.returncode == 0:
                 return f"Pattern matching completed successfully:\n{result.stdout}"
             else:

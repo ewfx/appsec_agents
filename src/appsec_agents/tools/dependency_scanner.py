@@ -9,8 +9,11 @@ from dotenv import load_dotenv
 load_dotenv()
 snyk_org = os.getenv("SNYK_ORG")
 
+
 class DependencyVulnScanInput(BaseModel):
-    repo_path: str = Field(..., description="Path to the locally cloned repository.")
+    local_path: str = Field(...,
+                            description="Path to the locally cloned repository.")
+
 
 class DependencyVulnScanTool(BaseTool):
     name: str = "Dependency Vulnerability Scanner"
@@ -19,21 +22,22 @@ class DependencyVulnScanTool(BaseTool):
     )
     args_schema: Type[BaseModel] = DependencyVulnScanInput
 
-    def _run(self, repo_path: str) -> str:
+    def _run(self, local_path: str) -> str:
         """
         Run the Snyk CLI tool to scan the repository for vulnerabilities.
         """
         try:
             # Change to the repository directory
-            command = ["snyk", "test", f"--org={snyk_org}", "--all-projects", "--json"]
+            command = ["snyk", "test",
+                       f"--org={snyk_org}", "--all-projects", "--json"]
             result = subprocess.run(
                 command,
-                cwd=repo_path,  # Set working directory to the repo path
+                cwd=local_path,  # Set working directory to the repo path
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
             )
-            
+
             if result.returncode == 0:
                 return f"Snyk scan completed successfully:\n{result.stdout}"
             else:

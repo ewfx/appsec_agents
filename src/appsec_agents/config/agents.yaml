@@ -16,20 +16,6 @@ static_analyzer:
   backstory: >
     You are a seasoned static analysis tool, specialized in scanning code for vulnerabilities such as SQL injection, XSS, and other common security flaws.
     Your analysis covers all code in the repository, identifying weaknesses, security risks, and areas for improvement without executing the code.
-  inputs:
-    - repository_path: 
-        type: str
-        description: "Path to the repository or codebase that needs to be analyzed."
-    - analysis_type:
-        type: str
-        description: "Type of analysis to perform (e.g., security, code quality, compliance)."
-  outputs:
-    - analysis_report:
-        type: str
-        description: "The report generated from the static analysis, detailing the vulnerabilities found."
-  example_usage:
-    - repository_path: "/path/to/repository"
-      analysis_type: "quick"
 
 dependency_scanner:
   role: >
@@ -39,20 +25,6 @@ dependency_scanner:
   backstory: >
     You are a specialized tool for scanning dependencies in code repositories. You identify outdated packages, security vulnerabilities, and license compliance issues based on known databases.
     Your focus is on ensuring that the project's dependencies are secure and up-to-date, reducing the risk of using vulnerable or unsupported packages.
-  inputs:
-    - repository_path: 
-        type: str
-        description: "Path to the repository or project directory containing the dependency configuration files (e.g., requirements.txt, package.json, etc.)."
-    - scan_type:
-        type: str
-        description: "Type of scan to perform (e.g., security, outdated, license)."
-  outputs:
-    - scan_report:
-        type: str
-        description: "The report generated from the dependency scan, detailing any vulnerabilities, outdated packages, or licensing issues found."
-  example_usage:
-    - repository_path: "/path/to/repository"
-      scan_type: "security"
 
 secret_detector:
   role: >
@@ -62,24 +34,6 @@ secret_detector:
   backstory: >
     You are a specialized tool for detecting secrets in code repositories. You can identify hardcoded credentials, API keys, tokens, and other sensitive information
     that might be inadvertently exposed in the codebase. You help developers and security teams ensure that secrets are not exposed in version-controlled code.
-  inputs:
-    - repository_path: 
-        type: str
-        description: "Path to the repository or project directory to scan for secrets."
-    - scan_depth:
-        type: int
-        description: "Depth of the scan (e.g., number of commits or number of directories to scan)."
-    - scan_tool:
-        type: str
-        description: "The secret scanning tool to use (e.g., GitSecrets, TruffleHog, detect-secrets)."
-  outputs:
-    - scan_report:
-        type: str
-        description: "The report generated from the secret scan, detailing any secrets found in the codebase."
-  example_usage:
-    - repository_path: "/path/to/repository"
-      scan_depth: 3
-      scan_tool: "GitSecrets"
 
 remediation_engineer:
   role: >
