@@ -3,6 +3,10 @@ from typing import Type
 from pydantic import BaseModel, Field
 import subprocess
 import os
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
 
 class CloneGitHubRepoInput(BaseModel):
     """Input schema for CloneGitHubRepo."""
@@ -31,12 +35,17 @@ class CloneGitHubRepoTool(BaseTool):
             )
             
             if result.returncode == 0:
+                logging.info(f"Repository successfully cloned to {destination}.")
                 return f"Repository successfully cloned to {destination}."
             else:
+                logging.error(f"Failed to clone repository. Error: {result.stderr}")
                 return f"Failed to clone repository. Error: {result.stderr}"
         except Exception as e:
+            logging.error(f"An error occurred while cloning the repository: {str(e)}")
             return f"An error occurred while cloning the repository: {str(e)}"
 
-    def _arun(self, repo_url: str, destination: str) -> str:
-        # Optional: Implement asynchronous version of the tool if needed.
-        raise NotImplementedError("This tool does not support asynchronous execution.")
+# Example usage
+if __name__ == "__main__":
+    tool = CloneGitHubRepoTool()
+    result = tool._run("https://github.com/example/repo", "/path/to/destination")
+    print(result)

@@ -1,33 +1,47 @@
+import os
 from crewai.tools import BaseTool
 from typing import Type
 from pydantic import BaseModel, Field
 import subprocess
-import os
+from dotenv import load_dotenv
 
-class DependencyVulnerabilityScanInput(BaseModel):
+# Get the Snyk organization from the environment variable
+load_dotenv()
+snyk_org = os.getenv("SNYK_ORG")
+
+class DependencyVulnScanInput(BaseModel):
     repo_path: str = Field(..., description="Path to the locally cloned repository.")
 
-class DependencyVulnerabilityScanTool(BaseTool):
+class DependencyVulnScanTool(BaseTool):
     name: str = "Dependency Vulnerability Scanner"
     description: str = (
-        "Scans the dependencies in a cloned repository for known vulnerabilities using tools like "
-        "npm audit, pip-audit, or other language-specific scanners."
+        "Scans the dependencies in a cloned repository for known vulnerabilities using Snyk."
     )
-    args_schema: Type[BaseModel] = DependencyVulnerabilityScanInput
+    args_schema: Type[BaseModel] = DependencyVulnScanInput
 
     def _run(self, repo_path: str) -> str:
+        """
+        Run the Snyk CLI tool to scan the repository for vulnerabilities.
+        """
         try:
-            # Run language-specific dependency scanner (example: pip-audit)
+            # Change to the repository directory
+            command = ["snyk", "test", f"--org={snyk_org}", "--all-projects", "--json"]
             result = subprocess.run(
-                ["pip-audit", "--directory", repo_path],
+                command,
+                cwd=repo_path,  # Set working directory to the repo path
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True
             )
             
             if result.returncode == 0:
-                return f"Dependency scan completed successfully:\n{result.stdout}"
+                return f"Snyk scan completed successfully:\n{result.stdout}"
             else:
-                return f"Dependency scan failed:\n{result.stderr}"
+                return f"Snyk scan failed with errors:\n{result.stderr}"
+        except FileNotFoundError:
+            return (
+                "Snyk CLI tool not found. Ensure it is installed and added to the system PATH. "
+                "Refer to https://snyk.io/ for installation instructions."
+            )
         except Exception as e:
-            return f"Error running dependency scanner: {str(e)}"
+            return f"Error running Snyk scanner: {str(e)}"

@@ -1,10 +1,46 @@
 #!/usr/bin/env python
+import json
 import sys
+import time
 import warnings
 
-from crew import AppsecAgents
+from appsec_agents.crew import AppsecAgents
+
+
+import logging
+from logging.handlers import RotatingFileHandler
+import os
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
+
+# Ensure the "logs" folder exists
+os.makedirs("logs", exist_ok=True)
+
+# Create a rotating file handler
+rotating_file_handler = RotatingFileHandler(
+    "logs/debug.log",
+    maxBytes=50 * 1024,  # 50 KB
+    backupCount=5  # Keep up to 5 backups
+)
+rotating_file_handler.setLevel(logging.DEBUG)
+rotating_file_handler.setFormatter(
+    logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+)
+
+# Create a console handler
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+console_handler.setFormatter(logging.Formatter('%(message)s'))
+
+# Configure logging with both handlers using basicConfig
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Format for the root logger
+    handlers=[rotating_file_handler, console_handler]  # Attach both handlers
+)
+
+logger = logging.getLogger(__name__)
+
 
 # This main file allows you to run, test, and train your crew locally.
 # Replace the `inputs` dictionary with the appropriate data for your use case.
@@ -19,7 +55,23 @@ def run():
         'analysis_mode': 'quick'
     }
     try:
-        AppsecAgents().crew().kickoff(inputs=inputs)
+        logger.info("Starting the crew...")
+        appsec = AppsecAgents()
+        crew = appsec.crew()
+        crew.kickoff(inputs=inputs)
+        
+        # Wait for the crew to complete its execution
+        
+        while not crew.is_complete():
+            time.sleep(1)  # Sleep for a short duration to avoid busy-waiting
+            
+        logger.info("Crew execution completed.")
+        
+        # Retrieve and print the results
+        results = crew.get_results()
+        logger.info("Crew results:")
+        logger.info(json.dumps(results, indent=2))
+
     except Exception as e:
         print(f"An error occurred while running the crew: {e}")
 

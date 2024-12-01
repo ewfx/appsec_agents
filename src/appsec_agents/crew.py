@@ -1,12 +1,15 @@
+import logging
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
 
 # Import custom tools for the project
-from tools.git_pr_tool import GitPRTool
-from tools.github_tool import CloneGitHubRepoTool
-from tools.dependency_scanner import DependencyVulnerabilityScanTool
-from tools.sca_tool import StaticCodeAnalysisTool
-from tools.secret_tool import SecretDetectionTool
+from appsec_agents.tools.git_pr_tool import GitPRTool
+from appsec_agents.tools.git_cloner_tool import CloneGitHubRepoTool
+from appsec_agents.tools.dependency_scanner import DependencyVulnScanTool
+from appsec_agents.tools.sca_tool import StaticCodeAnalysisTool
+from appsec_agents.tools.secret_tool import SecretDetectionTool
+
+logger = logging.getLogger(__name__)
 
 @CrewBase
 class AppsecAgents():
@@ -18,14 +21,14 @@ class AppsecAgents():
     @before_kickoff  # Hook to execute before the crew starts
     def setup_environment(self, inputs):
         """Prepare the environment or inputs before kickoff."""
-        print("Setting up the environment for the security analysis crew...")
+        logger.info("Setting up the environment for the security analysis crew...")
         inputs['repo_path'] = "/tmp/cloned_repo"  # Example of dynamically added input
         return inputs
 
     @after_kickoff  # Hook to execute after the crew finishes
     def summarize_results(self, output):
         """Log or summarize results after the crew finishes."""
-        print(f"Security Analysis Results: {output}")
+        logger.info(f"Security Analysis Results: {output}")
         return output
 
     @agent
@@ -51,7 +54,7 @@ class AppsecAgents():
         """Agent responsible for scanning dependencies for vulnerabilities."""
         return Agent(
             config=self.agents_config['dependency_scanner'],
-            tools=[DependencyVulnerabilityScanTool()],
+            tools=[DependencyVulnScanTool()],
             verbose=True
         )
 
