@@ -1,8 +1,9 @@
 from crewai.tools import BaseTool
 from typing import Type
 from pydantic import BaseModel, Field
-import subprocess
+from git import Repo, GitCommandError
 import os
+import shutil
 import logging
 
 # Set up logging
@@ -27,39 +28,26 @@ class CloneGitHubRepoTool(BaseTool):
 
     def _run(self, repo_url: str, local_path: str) -> str:
         try:
-            # Check if local_path directory exists and remove it if it does
+            # Check if the directory exists and remove it if necessary
             if os.path.exists(local_path):
-                logging.info(f"Removing existing directory at {local_path}")
-                subprocess.run(["rm", "-rf", local_path], check=True)
+                logger.info(f"Removing existing directory at {local_path}")
+                shutil.rmtree(local_path)
 
-            # Create the local_path directory
-            os.makedirs(local_path)
-
-            # Clone the repository using git
-            result = subprocess.run(
-                ["git", "clone", repo_url, local_path],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
-
-            if result.returncode == 0:
-                logging.info(f"Repository successfully cloned to {
-                             local_path}.")
-                return f"Repository successfully cloned to {local_path}."
-            else:
-                logging.error(f"Failed to clone repository. Error: {
-                              result.stderr}")
-                return f"Failed to clone repository. Error: {result.stderr}"
+            # Clone the repository
+            logger.info(f"Cloning repository from {repo_url} to {local_path}")
+            Repo.clone_from(repo_url, local_path)
+            logger.info(f"Repository successfully cloned to {local_path}")
+            return f"Repository successfully cloned to {local_path}."
+        except GitCommandError as e:
+            logger.error(f"Git error occurred: {e}")
+            return f"Failed to clone repository. Git error: {e}"
         except Exception as e:
-            logging.error(
-                f"An error occurred while cloning the repository: {str(e)}")
-            return f"An error occurred while cloning the repository: {str(e)}"
+            logger.error(f"An unexpected error occurred: {e}")
+            return f"An error occurred while cloning the repository: {e}"
 
 
 # Example usage
 if __name__ == "__main__":
     tool = CloneGitHubRepoTool()
-    result = tool._run("https://github.com/example/repo",
-                       "/path/to/local_path")
+    result = tool._run('https://github.com/ewfx/appsec_sample_code', "/temp/appsec_sample_code")
     print(result)
