@@ -11,6 +11,7 @@ from appsec_agents.tools.secret_tool import SecretDetectionTool
 
 logger = logging.getLogger(__name__)
 
+
 @CrewBase
 class AppsecAgents():
     """AppsecAgents crew for identifying, diagnosing, and fixing security vulnerabilities."""
@@ -21,8 +22,9 @@ class AppsecAgents():
     @before_kickoff  # Hook to execute before the crew starts
     def setup_environment(self, inputs):
         """Prepare the environment or inputs before kickoff."""
-        logger.info("Setting up the environment for the security analysis crew...")
-        inputs['repo_path'] = "/tmp/cloned_repo"  # Example of dynamically added input
+        logger.info(
+            "Setting up the environment for the security analysis crew...")
+        # Example of dynamically added input
         return inputs
 
     @after_kickoff  # Hook to execute after the crew finishes
@@ -39,7 +41,7 @@ class AppsecAgents():
             tools=[CloneGitHubRepoTool()],
             verbose=True
         )
-    
+
     @agent
     def static_analyzer(self) -> Agent:
         """Agent responsible for static code analysis."""
