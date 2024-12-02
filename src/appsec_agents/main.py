@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import json
+import random
+import string
 import sys
 import time
 import warnings
@@ -42,6 +44,10 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+def generate_run_id(length=6):
+    timestamp = int(time.time())
+    random_chars = ''.join(random.choices(string.ascii_lowercase + string.digits, k=length))
+    return f"{timestamp % 10000:04d}{random_chars}"
 
 # This main file allows you to run, test, and train your crew locally.
 # Replace the `inputs` dictionary with the appropriate data for your use case.
@@ -52,7 +58,7 @@ def run():
     """
     inputs = {
         'repo_url': 'https://github.com/ewfx/appsec_sample_code',
-        'local_path': '/tmp/cloned_repo',
+        'local_path': f'/tmp/cloned_repo_{generate_run_id()}',
         'scan_depth': 3,
         'analysis_mode': 'quick'
     }
