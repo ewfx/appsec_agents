@@ -22,10 +22,11 @@ class SecretDetectionTool(BaseTool):
         try:
             # Example: Using truffleHog
             result = subprocess.run(
-                ["trufflehog", "filesystem", "--directory", local_path],
+                ["trufflehog", "filesystem", local_path],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
+                text=True,
+                encoding="utf-8"
             )
 
             if result.returncode == 0:
