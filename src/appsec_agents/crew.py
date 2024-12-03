@@ -7,6 +7,7 @@ from appsec_agents.tools.git_pr_tool import GitPRTool
 from appsec_agents.tools.git_cloner_tool import CloneGitHubRepoTool
 from appsec_agents.tools.dependency_scanner import DependencyVulnScanTool
 from appsec_agents.tools.sca_tool import StaticCodeAnalysisTool
+from appsec_agents.tools.sca_pmd_scan import PMDStaticCodeAnalysisTool
 from appsec_agents.tools.secret_tool import SecretDetectionTool
 
 logger = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ class AppsecAgents():
         """Agent responsible for static code analysis."""
         return Agent(
             config=self.agents_config['static_analyzer'],
-            tools=[StaticCodeAnalysisTool()],
+            tools=[PMDStaticCodeAnalysisTool()],
             verbose=True
         )
 

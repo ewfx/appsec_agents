@@ -49,5 +49,6 @@ class CloneGitHubRepoTool(BaseTool):
 # Example usage
 if __name__ == "__main__":
     tool = CloneGitHubRepoTool()
-    result = tool._run('https://github.com/ewfx/appsec_sample_code', "/temp/appsec_sample_code")
+    result = tool._run(
+        'https://github.com/ewfx/appsec_sample_code', "/temp/appsec_sample_code")
     print(result)
