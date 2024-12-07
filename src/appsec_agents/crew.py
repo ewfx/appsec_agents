@@ -1,6 +1,8 @@
 import logging
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
+from crewai_tools import FileReadTool
+from crewai_tools import FileWriterTool
 
 # Import custom tools for the project
 from appsec_agents.tools.git_pr_tool import GitPRTool
@@ -71,6 +73,15 @@ class AppsecAgents():
         )
 
     @agent
+    def secret_remediator(self) -> Agent:
+        """Agent responsible for fixing hardcoded secrets."""
+        return Agent(
+            config=self.agents_config['secret_remediator'],
+            tools=[FileReadTool(), FileWriterTool()], 
+            verbose=True
+        )
+
+    @agent
     def remediation_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['remediation_engineer'],
@@ -104,6 +115,13 @@ class AppsecAgents():
         """Task to detect hardcoded secrets."""
         return Task(
             config=self.tasks_config['detect_secrets_task'],
+        )
+
+    @task
+    def remediate_secrets_task(self) -> Task:
+        """Task to remediate hardcoded secrets."""
+        return Task(
+            config=self.tasks_config['remediate_secrets_task'],
         )
 
     @crew
