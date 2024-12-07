@@ -50,3 +50,31 @@ detect_secrets_task:
   expected_output: >
     A brief report containing the list of detected secrets, including where they were found, what type they are and how to correctly address it.
   agent: secret_detector
+
+remediate_secrets_task:
+  description: >
+    Use the output from the detect_secrets_task to automatically fix the code and remediate any exposed secrets.
+  depends_on: detect_secrets_task
+  input: detect_secrets_task.output
+  agent: secret_remediator
+  model: ${MODEL}
+  prompt: >
+    Fix the code to remediate the exposed secrets detected in the previous task.
+    Use the output from detect_secrets_task as input: {input}. Go over the input and understand the data fully.
+    The input {input} contains the file path under field "Location" from where you can read contents from.
+    Normalize the file path to match the current operating system:
+    - On Windows, replace "/tmp" with "C:/tmp".
+    - On Unix-based systems, retain "/tmp".
+    Log updated/normalized file path: {input.Location}.
+    Verify if the file at updated/normalized path {input.Location} exists before proceeding.
+    If the file does not exist, log an error and skip to the next file.
+    If the file exists, continue with the remediation process.
+    Read the entire file content using FileReadTool.    
+    Log content after reading: FileReadTool({input.Location}).read().   
+    Fix/remediate the exposed secrets in the file content.
+    Use the FileWriter tool to write the remediated code (modified content) back to the file: `FileWriter({input.Location}).write({output})`.
+    Log content after modification and before writing.
+    Repeat the same for all files in {input}
+  expected_output: >
+    Remediated code with the exposed secrets and vulnerabilites replaced with proper code.
+    Original file content to be replaced with the remediated content in the FileWriter.
