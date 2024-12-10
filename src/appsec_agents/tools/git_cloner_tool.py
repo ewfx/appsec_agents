@@ -35,9 +35,20 @@ class CloneGitHubRepoTool(BaseTool):
 
             # Clone the repository
             logger.info(f"Cloning repository from {repo_url} to {local_path}")
-            Repo.clone_from(repo_url, local_path)
+            repo = Repo.clone_from(repo_url, local_path)
             logger.info(f"Repository successfully cloned to {local_path}")
-            return f"Repository successfully cloned to {local_path}."
+
+            # Create and checkout new branch
+            try:
+                new_branch = repo.create_head('vuln_fix')
+                new_branch.checkout()
+                logger.info("Created and checked out 'vuln_fix' branch")
+                return f"Repository successfully cloned to {local_path} and created/checked out 'vuln_fix' branch."
+            except Exception as branch_error:
+                logger.error(
+                    f"Error creating/checking out branch: {branch_error}")
+                return f"Repository cloned but failed to create/checkout branch: {branch_error}"
+
         except GitCommandError as e:
             logger.error(f"Git error occurred: {e}")
             return f"Failed to clone repository. Git error: {e}"
