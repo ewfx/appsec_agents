@@ -5,8 +5,26 @@ run_static_analysis_task:
     as of 2024.
   expected_output: >
     A list of all the security vulnerabilities present in the repo, each with a brief description, the affected systems, and the 
-    potential risks associated with them.
+    potential risks associated with them. A JSON object with 'files' (list) and 'commit_message' (string) fields, each object in 'files' should 
+    have the following fields 'filepath' (str), filename (str), issue (str) and how_to_fix (str). The fixes provided in 'how_to_fix' for each file should be
+    a fix that can be done within the same file without creating another file. If a single file has multiple issues, combine them. Each file should
+    only appear once in the files list.
+    The 'commit_message' message field should contain a 1-2 line commit message summarizing the changes that will be made to fix the issues found.
   agent: static_analyzer
+
+fix_static_code:
+  description: >
+    Given a list of files to be fixed, iterate over each file and fix it.
+  expected_output: >
+    A brief report of all the fixes that were made and why they were necessary
+  agent: remediation_engineer
+
+commit_changes:
+  description: >
+    Stage all the files and commit the code to a git repo.
+  expected_output: >
+    The commit message
+  agent: remediation_engineer
 
 scan_dependencies_task:
   description: >

@@ -1,18 +1,36 @@
 import logging
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, before_kickoff, after_kickoff
+from crewai.flow.flow import listen
 from crewai_tools import FileReadTool
 from crewai_tools import FileWriterTool
+
+from pydantic import BaseModel
+from typing import List
 
 # Import custom tools for the project
 from appsec_agents.tools.git_pr_tool import GitPRTool
 from appsec_agents.tools.git_cloner_tool import CloneGitHubRepoTool
 from appsec_agents.tools.dependency_scanner import DependencyVulnScanTool
 from appsec_agents.tools.sca_tool import StaticCodeAnalysisTool
+from appsec_agents.tools.fix_single_file import FixSingleFileTool
+from appsec_agents.tools.git_commit_tool import CommitChangesTool
 from appsec_agents.tools.sca_pmd_scan import PMDStaticCodeAnalysisTool
 from appsec_agents.tools.secret_tool import SecretDetectionTool
 
 logger = logging.getLogger(__name__)
+
+
+class FileFixInfo(BaseModel):
+    filepath: str
+    filename: str
+    issue: str
+    how_to_fix: str
+
+
+class FilesToFix(BaseModel):
+    files: List[FileFixInfo]
+    commit_message: str
 
 
 @CrewBase
@@ -77,7 +95,7 @@ class AppsecAgents():
         """Agent responsible for fixing hardcoded secrets."""
         return Agent(
             config=self.agents_config['secret_remediator'],
-            tools=[FileReadTool(), FileWriterTool()], 
+            tools=[FileReadTool(), FileWriterTool()],
             verbose=True
         )
 
@@ -85,7 +103,7 @@ class AppsecAgents():
     def remediation_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['remediation_engineer'],
-            tools=[GitPRTool()],  # Add the custom tool for submitting PRs
+            tools=[FixSingleFileTool(), CommitChangesTool()],
             verbose=True
         )
 
@@ -101,28 +119,45 @@ class AppsecAgents():
         """Task to run static code analysis."""
         return Task(
             config=self.tasks_config['run_static_analysis_task'],
+            output_json=FilesToFix
         )
 
     @task
-    def scan_dependencies_task(self) -> Task:
-        """Task to scan dependencies for vulnerabilities."""
+    @listen("run_static_analysis_task")
+    def fix_static_code(self) -> Task:
+        """Task to fix static code."""
         return Task(
-            config=self.tasks_config['scan_dependencies_task'],
+            config=self.tasks_config['fix_static_code'],
         )
 
     @task
-    def detect_secrets_task(self) -> Task:
-        """Task to detect hardcoded secrets."""
+    @listen("run_static_analysis_task")
+    def commit_changes(self) -> Task:
+        """Task to commit changes made."""
         return Task(
-            config=self.tasks_config['detect_secrets_task'],
+            config=self.tasks_config['commit_changes'],
         )
 
-    @task
-    def remediate_secrets_task(self) -> Task:
-        """Task to remediate hardcoded secrets."""
-        return Task(
-            config=self.tasks_config['remediate_secrets_task'],
-        )
+    # @task
+    # def scan_dependencies_task(self) -> Task:
+    #     """Task to scan dependencies for vulnerabilities."""
+    #     return Task(
+    #         config=self.tasks_config['scan_dependencies_task'],
+    #     )
+
+    # @task
+    # def detect_secrets_task(self) -> Task:
+    #     """Task to detect hardcoded secrets."""
+    #     return Task(
+    #         config=self.tasks_config['detect_secrets_task'],
+    #     )
+
+    # @task
+    # def remediate_secrets_task(self) -> Task:
+    #     """Task to remediate hardcoded secrets."""
+    #     return Task(
+    #         config=self.tasks_config['remediate_secrets_task'],
+    #     )
 
     @crew
     def crew(self) -> Crew:
