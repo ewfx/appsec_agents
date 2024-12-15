@@ -30,7 +30,7 @@ class FixSingleFileToolInput(BaseModel):
 
 
 class FixSingleFileTool(BaseTool):
-    name: str = "fix_single_file"
+    name: str = "Fix single file"
     description: str = "Fixes security vulnerabilities in files using Gemini API"
 
     def _run(self, files: Any) -> List[Dict]:

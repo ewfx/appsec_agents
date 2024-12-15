@@ -14,7 +14,7 @@ from appsec_agents.tools.git_cloner_tool import CloneGitHubRepoTool
 from appsec_agents.tools.dependency_scanner import DependencyVulnScanTool
 from appsec_agents.tools.sca_tool import StaticCodeAnalysisTool
 from appsec_agents.tools.fix_single_file import FixSingleFileTool
-from appsec_agents.tools.git_commit_tool import CommitChangesTool
+from appsec_agents.tools.git_tool import GitTool
 from appsec_agents.tools.sca_pmd_scan import PMDStaticCodeAnalysisTool
 from appsec_agents.tools.secret_tool import SecretDetectionTool
 
@@ -103,8 +103,17 @@ class AppsecAgents():
     def remediation_engineer(self) -> Agent:
         return Agent(
             config=self.agents_config['remediation_engineer'],
-            tools=[FixSingleFileTool(), CommitChangesTool()],
+            tools=[FixSingleFileTool()],
             verbose=True
+        )
+
+    @agent
+    def git_manager(self) -> Agent:
+        return Agent(
+            config=self.agents_config['git_manager'],
+            tools=[GitTool()],
+            verbose=True,
+            cache=False
         )
 
     @task
@@ -132,8 +141,8 @@ class AppsecAgents():
 
     @task
     @listen("run_static_analysis_task")
-    def commit_changes(self) -> Task:
-        """Task to commit changes made."""
+    def static_fix_commit_changes(self) -> Task:
+        """Task to commit changes made while fixing static code issues."""
         return Task(
             config=self.tasks_config['commit_changes'],
         )
@@ -145,19 +154,28 @@ class AppsecAgents():
     #         config=self.tasks_config['scan_dependencies_task'],
     #     )
 
-    # @task
-    # def detect_secrets_task(self) -> Task:
-    #     """Task to detect hardcoded secrets."""
-    #     return Task(
-    #         config=self.tasks_config['detect_secrets_task'],
-    #     )
+    @task
+    def detect_secrets_task(self) -> Task:
+        """Task to detect hardcoded secrets."""
+        return Task(
+            config=self.tasks_config['detect_secrets_task'],
+        )
 
-    # @task
-    # def remediate_secrets_task(self) -> Task:
-    #     """Task to remediate hardcoded secrets."""
-    #     return Task(
-    #         config=self.tasks_config['remediate_secrets_task'],
-    #     )
+    @task
+    @listen("detect_secrets_task")
+    def remediate_secrets_task(self) -> Task:
+        """Task to remediate hardcoded secrets."""
+        return Task(
+            config=self.tasks_config['remediate_secrets_task'],
+        )
+
+    @task
+    @listen("remediate_secrets_task")
+    def secret_fix_commit_changes(self) -> Task:
+        """Task to commit changes made while fixing secrets."""
+        return Task(
+            config=self.tasks_config['commit_changes'],
+        )
 
     @crew
     def crew(self) -> Crew:

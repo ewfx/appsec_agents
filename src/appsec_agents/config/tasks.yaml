@@ -21,10 +21,11 @@ fix_static_code:
 
 commit_changes:
   description: >
-    Stage all the files and commit the code to a git repo.
+    Look at all the changes made using git diff, stage all the files and commit the code to a git repo at {local_path}.
+    The commit message should be a 1-2 line messages detailing the changes made.
   expected_output: >
     The commit message
-  agent: remediation_engineer
+  agent: git_manager
 
 scan_dependencies_task:
   description: >
