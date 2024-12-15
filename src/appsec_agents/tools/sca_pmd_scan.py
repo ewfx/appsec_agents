@@ -19,7 +19,7 @@ class PMDStaticCodeAnalysisTool(BaseTool):
 
     def _run(self, local_path: str) -> str:
         try:
-            command = f"pmd check -f text -R category/java/errorprone.xml,category/java/bestpractices.xml,category/java/security.xml,category/java/performance.xml  -d {
+            command = f"pmd check -f text -R category/java/errorprone.xml,category/java/security.xml,category/java/performance.xml  -d {
                 local_path}/src/main/java -r report.txt --no-cache"
 
             result = subprocess.run(command, cwd=local_path, stdout=subprocess.PIPE,
